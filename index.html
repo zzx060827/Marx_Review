@@ -1,0 +1,634 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>马克思主义基本原理复习与自测</title>
+    <style>
+        /* --- 基础变量 --- */
+        :root {
+            --primary-color: #2c3e50;
+            --accent-color: #3498db;
+            --success-color: #27ae60;
+            --error-color: #c0392b;
+            --bg-color: #f5f6fa;
+            --card-bg: #ffffff;
+            --text-gray: #6b7280;
+        }
+
+        body {
+            font-family: "PingFang SC", "Microsoft YaHei", sans-serif;
+            background-color: var(--bg-color);
+            color: var(--primary-color);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 900px;
+            background: var(--card-bg);
+            border-radius: 16px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+            padding: 30px;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            height: 90vh; /* 固定高度，让内部滚动 */
+            position: relative;
+        }
+
+        /* --- 顶部个人品牌 --- */
+        .branding-section {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            z-index: 10;
+        }
+        
+        .branding-link {
+            display: flex;
+            align-items: center;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        .branding-text {
+            font-size: 14px;
+            color: var(--text-gray);
+            margin-right: 12px;
+            transition: color 0.3s;
+        }
+
+        .branding-link:hover .branding-text {
+            color: var(--accent-color);
+        }
+
+        .branding-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            object-fit: cover;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            border: 2px solid transparent;
+            transition: all 0.3s;
+        }
+
+        .branding-link:hover .branding-avatar {
+            border-color: var(--accent-color);
+            transform: scale(1.05);
+        }
+
+        /* --- 标题与统计 --- */
+        h1 {
+            text-align: center;
+            color: var(--primary-color);
+            margin: 10px 0 20px 0;
+            font-size: 24px;
+            flex-shrink: 0;
+            padding-right: 100px;
+        }
+
+        .stats-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            background: #f8f9fa;
+            padding: 10px 15px;
+            border-radius: 8px;
+            font-size: 14px;
+            flex-shrink: 0;
+            border: 1px solid #eee;
+        }
+
+        /* --- 控制面板与导航 --- */
+        .controls-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 10px;
+            flex-shrink: 0;
+        }
+
+        .mode-group {
+            display: flex;
+            gap: 8px;
+        }
+
+        .nav-group {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        button {
+            padding: 8px 14px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.2s;
+            background-color: #fff;
+            color: #4b5563;
+        }
+
+        button.active {
+            background-color: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+        }
+
+        button:hover:not(.disabled) {
+            background-color: #f3f4f6;
+            transform: translateY(-1px);
+        }
+        
+        button.active:hover {
+            background-color: #1a252f;
+        }
+
+        .jump-input {
+            width: 50px;
+            padding: 6px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            text-align: center;
+        }
+
+        /* --- 答题区域 --- */
+        .question-card {
+            background: #fff;
+            border: 2px solid #e5e7eb;
+            border-radius: 12px;
+            padding: 25px;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+        }
+
+        .question-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: #111827;
+            line-height: 1.6;
+        }
+
+        textarea {
+            width: 100%;
+            height: 120px;
+            padding: 15px;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            resize: vertical;
+            font-size: 16px;
+            font-family: inherit;
+            box-sizing: border-box;
+            margin-bottom: 20px;
+            transition: border-color 0.2s;
+        }
+
+        textarea:focus { outline: none; border-color: var(--accent-color); box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1); }
+
+        .action-area {
+            display: flex;
+            justify-content: space-between;
+            gap: 10px;
+            margin-top: auto; /* 底部对齐 */
+        }
+
+        .btn-submit { background-color: var(--success-color); color: white; border: none; flex: 2; }
+        .btn-submit:hover { background-color: #219150; }
+        
+        .btn-prev { flex: 1; }
+        .btn-next { flex: 1; border-color: var(--accent-color); color: var(--accent-color); }
+        .btn-next:hover { background-color: var(--accent-color); color: white; }
+
+        /* --- 结果展示 --- */
+        .result-area {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 8px;
+            background-color: #f9fafb;
+            display: none;
+            border: 1px solid #eee;
+        }
+
+        .result-header { font-weight: bold; font-size: 16px; margin-bottom: 10px; display: flex; align-items: center; gap: 10px; }
+        .score-badge { padding: 4px 8px; border-radius: 4px; font-size: 12px; color: white; }
+        .badge-pass { background-color: var(--success-color); }
+        .badge-fail { background-color: var(--error-color); }
+
+        .standard-answer {
+            color: #374151;
+            background: #eefdf5;
+            padding: 15px;
+            border-radius: 6px;
+            border-left: 4px solid var(--success-color);
+            line-height: 1.6;
+            white-space: pre-wrap;
+            font-size: 15px;
+        }
+
+        /* --- 知识点列表模式 (修改重点) --- */
+        .list-view-area {
+            display: none;
+            flex-grow: 1;
+            overflow-y: auto;
+            background: #fff;
+            border: 1px solid #e5e7eb;
+            border-radius: 12px;
+            padding: 15px; /* 增加内边距 */
+        }
+
+        .list-item {
+            padding: 20px; /* 增加每个条目的间距 */
+            border-bottom: 1px solid #f3f4f6;
+            cursor: pointer;
+            transition: background 0.2s;
+            border-radius: 8px;
+            margin-bottom: 10px; /* 条目之间分开一点 */
+        }
+        
+        .list-item:hover { background-color: #f9fafb; }
+        .list-item.active-item { background-color: #eef2ff; border-left: 4px solid var(--accent-color); }
+
+        .list-q { 
+            font-weight: 700; 
+            color: var(--primary-color); 
+            margin-bottom: 10px; 
+            font-size: 16px; /* 标题稍大 */
+        }
+
+        /* 答案区域样式调整：完全展开，不再截断 */
+        .list-a { 
+            color: #374151; /* 颜色更深，更清晰 */
+            font-size: 15px; /* 字体加大 */
+            line-height: 1.6; /* 行高舒适 */
+            white-space: pre-wrap; /* 保留换行 */
+            /* 移除了之前的 -webkit-line-clamp 等截断属性 */
+        }
+
+        /* 滚动条美化 */
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #d1d5db; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #9ca3af; }
+
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="branding-section">
+        <a href="https://github.com/zzx060827" target="_blank" rel="noopener noreferrer" class="branding-link">
+            <span class="branding-text">Presented by zzx</span>
+            <img src="https://i.postimg.cc/44VBbR31/20250611113901.jpg" class="branding-avatar" alt="User Avatar" onerror="this.style.display='none'">
+        </a>
+    </div>
+
+    <h1>马克思主义基本原理复习与自测</h1>
+    
+    <div class="stats-bar">
+        <span id="progress-text">进度: 1 / 100</span>
+        <span id="score-text">准确率: --</span>
+        <span id="error-count" style="color: var(--error-color);">错题本: 0</span>
+    </div>
+
+    <div class="controls-row">
+        <div class="mode-group">
+            <button id="mode-seq" class="active" onclick="setMode('seq')">顺序模式</button>
+            <button id="mode-rand" onclick="setMode('rand')">随机模式</button>
+            <button id="mode-err" onclick="setMode('err')">错题本</button>
+            <button id="mode-list" onclick="setMode('list')">📖 知识点一览</button>
+        </div>
+        
+        <div class="nav-group" id="nav-controls">
+            <span>跳转至:</span>
+            <input type="number" id="jump-index" class="jump-input" min="1" onkeypress="handleJumpEnter(event)">
+            <button onclick="jumpToQuestion()">Go</button>
+        </div>
+    </div>
+
+    <div id="quiz-area" class="question-card">
+        <div id="question-text" class="question-title">加载中...</div>
+        <textarea id="user-input" placeholder="请在此输入你的答案...（支持模糊匹配，不计标点符号）"></textarea>
+        
+        <div class="action-area">
+            <button class="btn-prev" onclick="changeQuestion(-1)">上一题</button>
+            <button class="btn-submit" id="btn-submit" onclick="checkAnswer()">提交验证</button>
+            <button class="btn-next" id="btn-next" onclick="changeQuestion(1)">下一题</button>
+        </div>
+
+        <div id="result-area" class="result-area">
+            <div id="result-header" class="result-header"></div>
+            <div class="answer-comparison">
+                <div id="standard-answer" class="standard-answer"></div>
+            </div>
+        </div>
+    </div>
+
+    <div id="list-view" class="list-view-area"></div>
+</div>
+
+<script>
+const rawData = [
+        // 导论
+        { q: "什么是马克思主义？（总括、哲学、政经科社、目的作用）", a: "1. 总括：马克思主义是由马克思和恩格斯创立并为后继者所不断发展的科学理论体系。\n2. 哲学角度：是关于自然、社会和人类思维发展一般规律的学说。\n3. 政治经济学和科学社会主义角度：是关于社会主义必然代替资本主义、最终实现共产主义的学说。\n4. 最终目的和重要作用：是关于无产阶级解放、全人类解放和每个人自由而全面发展的学说，是指引人民创造美好生活的行动指南。" },
+        { q: "马克思主义的基本立场、基本观点和基本方法是什么？", a: "1. 基本立场：观察、分析和解决问题的根本立足点和出发点。以无产阶级的解放和全人类的解放为己任，以人的自由全面发展为美好目标；以人民为中心。\n2. 基本观点：关于自然、社会和人类思维发展一般规律的科学认识，是对人类思想成果和社会实践经验的科学总结。\n3. 基本方法：建立在辩证唯物主义和历史唯物主义世界观和方法论基础上，指导我们正确认识世界和改造世界的思想方法和工作方法。" },
+        { q: "马克思主义是如何产生的", a: "1848年共产党宣言的发表标志着马克思主义的公开问世，其产生的社会根源、阶级基础和思想渊源如下：\n1. 社会根源：工业革命后资本主义生产方式的发展，及其带来的社会灾难（两极分化、经济危机）。\n2. 阶级基础：无产阶级反对资产阶级的斗争标志着无产阶级登上历史舞台。\n3. 思想渊源：直接理论来源是德国古典哲学、英国古典政治经济学、英法空想社会主义。自然科学前提是能量守恒定律、细胞学说、生物进化论。更广泛意义上包括古希腊罗马哲学，文艺复兴运动的思想成果，法国复辟时期历史学家的进步思想" },
+        { q: "马克思主义的基本特征是什么？", a: "鲜明的科学性、人民性、实践性和发展性。\n1. 科学性：正确反映自然，社会与人类思想发展的本质与规律，逻辑严密，具有科学探索性。\n2. 人民性：是本质属性，人民至上，以阶级性为基础。\n3. 实践性：实践观点是首要的和基本的观点。从实践中来，到实践中去。\n4. 发展性：与时俱进，开放的学说。\n一句话概括：科学性与革命性的统一。革命性是马克思主义的内在本质，是其人民性，实践性和发展性的必然要求\n革命性是建立在科学性基础之上的，是与科学性高度统一的。" },
+        
+        // 第一章
+        { q: "哲学的基本问题及其内容？", a: "存在和思维、物质和精神的关系问题。\n1. 存在和思维，物质和精神何者为本原（第一性）：划分唯物主义和唯心主义的标准。\n2. 存在和思维，物质和精神是否具有同一性（思维能否正确反映存在）：思维能否正确的反映存在，人能否认识或彻底认识世界的问题，划分可知论和不可知论的标准。" },
+        { q: "马克思主义物质观（物质的定义及理论意义）", a: "1. 概念：物质是标志客观实在的哲学范畴，是不依赖于人的意识而存在，并能为人的意识所反映的客观实在。物质具有客观实在性。\n2. 意义：坚持唯物主义一元论同唯心主义划清了界限；坚持能动的反映论和可知论；体现唯物论和辩证法的统一；体现自然观与历史观的统一。" },
+        { q: "物质的存在方式和根本属性是运动", a: "1. 运动的概念是标志一切事物和现象的变化及其过程的哲学范畴。\n2. 物质和运动不可分割：运动是物质的运动，物质是运动着的物质。\n3. 绝对运动与相对静止对立统一：运动是绝对的（变动性、无条件性）；静止是相对的，包括空间位置的暂时不变和事物根本性质暂时不变（体现运动的稳定性、有条件性）；二者相互依赖，对立统一。" },
+        { q: "物质运动的基本存在形式：时间和空间的概念及特性？", a: "1. 时间：物质运动的持续性、顺序性，特点是一维性。\n2. 空间：物质运动的广延性、伸张性，特点是三维性。\n3. 客观性：物质运动与时空不可分割。\n4. 方法论：想问题，做事一切以时间、地点、条件为转移。" },
+        { q: "物质和意识的辩证关系原理？", a: "1. 物质决定意识（从意识的本质和起源思考）：意识是自然界和人类社会历史长期发展的产物，是人脑的机能和属性，是客观世界的主观映像。意识的内容是客观的，形式上是主观的，是客观内容和主观形式的统一。\n2. 意识对物质具有反作用（能动作用）：意识具有目的性、计划性、创造性；指导实践改造客观世界；调控人的行为和生理活动。\n3. 方法论：正确把握物质与意识的辩证关系，要求我们坚持一切从实际出发，实事求是，处理好主观能动性和客观规律性的关系" },
+        { q: "人工智能与人类意识的区别？", a: "1. 人工智能实质是对人脑组织结构与思维运行机制的模仿，是人类意识的物化。\n2. 区别：人类意识是知情意统一体，AI只是模拟理性智能；人类意识有社会性，AI无；人类语言是思维外壳，AI难以完全理解自然语言；人脑有无法被化约为数字信号的内容。" },
+        { q: "世界的物质统一性原理？", a: "世界的统一性在于它的物质性。\n1. 自然界是物质的，人类实践无法改变客观实在性\n2. 人类社会本质上是生产实践基础上形成的物质体系（自然基础是物质的、获取生活资料的活动是物质性的、物质资料的生产方式构成了人类社会的基础，体现社会的物质性）。\n3. 意识统一于物质。\n4. 世界的物质统一性是多样性的统一。\n5. 方法论：一切从实际出发，实事求是。" },
+        { q: "实践的含义及基本特征？", a: "1. 含义：人类能动地改造世界的社会性的物质活动。\n2. 特征：客观实在性（诸要素是客观的，受规律支配）；自觉能动性（有目的有意识）；社会历史性（处在社会关系中，受历史条件制约）。" },
+        { q: "实践的基本结构（主体、客体、中介）", a: "1. 实践主体：具有能力、从事社会实践的人。\n2. 实践客体：实践活动指向的对象。\n3. 实践中介：工具、手段、程序、方法。\n4. 关系：主体与客体的实践关系（最根本）、认识关系、价值关系。\n5. 演变：主体客体化和客体主体化的双向运动。" },
+        { q: "主观能动性与客观规律性的辩证统一？", a: "1. 尊重客观规律是正确发挥主观能动性的前提。\n2. 只有充分发挥主观能动性，才能正确认识和利用客观规律。\n3. 正确发挥主观能动性的前提：从实际出发；以实践为途径；依赖物质条件。\n4. 要求：充分发扬历史主动精神。" },
+        { q: "唯物辩证法的总观点：联系观", a: "1. 联系：事物之间和内部要素间相互影响、制约、作用。\n2. 特点：客观性（固有）；普遍性（内部要素联系、同其他事物联系、世界是统一整体）；多样性；条件性（支持或制约，可改变条件但需尊重规律）。" },
+        { q: "唯物辩证法的总观点：发展观（实质与新事物）", a: "1. 实质：新事物的产生和旧事物的灭亡。\n2. 新事物不可战胜的原因：适应新环境；否定消极腐朽、继承合理因素、添加新内容；符合人民群众利益。" },
+        { q: "量变质变规律", a: "1. 量变是质变的必要准备。\n2. 质变是量变的必然结果，并为新量变开辟道路。\n3. 相互渗透：总的量变中有部分质变，质变中有量的扩张。\n4. 方法论：注重积累，抓住机遇。" },
+        { q: "否定之否定规律", a: "1. 否定是事物的自我否定，是发展的环节，是联系的环节。\n2. 实质是“扬弃”（批判继承）。\n3. 揭示了事物发展的前进性与曲折性的统一。" },
+        { q: "对立统一规律（矛盾同一性与斗争性）", a: "对立统一规律是唯物辩证法的实质与核心。\n1. 同一性：相互依存、相互贯通（转化）。\n2. 斗争性：相互排斥、相互分离。\n3. 关系：斗争性寓于同一性之中；同一性相对，斗争性绝对。\n4. 作用：同一性是存在前提，规定发展趋势；斗争性促进力量转化，是过渡的决定力量。" },
+        { q: "矛盾的普遍性和特殊性及其关系", a: "1. 普遍性：矛盾存在于一切事物中，贯穿始终（共性）。\n2. 特殊性：不同阶段各有特点，决定事物性质（个性）。\n3. 关系：共性与个性的辩证统一，共性寓于个性之中。\n4. 方法论：具体问题具体分析；马克思主义普遍真理同具体实际相结合。" },
+        { q: "主观辩证法与客观辩证法", a: "1. 客观辩证法：客观事物的辩证运动。\n2. 主观辩证法：人类思维的辩证运动。\n3. 关系：本质统一，表现形式不同。主观辩证法是客观辩证法在人的思维中的反映。" },
+        
+        // 第二章
+        { q: "实践在认识活动中的决定作用（实践是认识的基础）", a: "1. 实践是认识的来源。\n2. 实践是认识发展的动力（提供需要、手段、锻炼能力）。\n3. 实践是认识的目的。\n4. 实践是检验认识真理性的唯一标准。" },
+        { q: "认识的本质", a: "主体在实践基础上对客体的能动反映。\n特点：具有反映性（摹写性，客观性）和创造性（能动性）。是反映性与创造性的辩证统一。" },
+        { q: "认识运动的基本规律（两次飞跃）", a: "1. 从实践到认识（感性到理性）：感性认识（直接、具体）包括感觉、知觉、表象；理性认识（抽象、间接）包括概念、判断、推理。条件：丰富感性材料+科学抽象思考。\n2. 从认识到实践：指导改造世界，检验真理。环节：确定目的、方案、中间实验、宣传群众。\n3. 总规律：反复循环，无限发展，波浪式前进，螺旋式上升。" },
+        { q: "真理的客观性、绝对性与相对性", a: "1. 客观性：内容客观，形式主观，一元性。\n2. 绝对性：主客观统一的确定性；认识发展的无限性。\n3. 相对性：认识的广度、深度有限度。\n4. 关系：相互依存，相互包含，辩证转化。反对绝对主义和相对主义。" },
+        { q: "真理与谬误", a: "1. 谬误是对客观事物及规律的歪曲反映。\n2. 关系：既对立又统一。\n3. 转化：真理在一定范围、条件下是真理，超出则变谬误；修正错误可转化为真理；批判谬误发展真理。" },
+        { q: "真理检验标准（为什么实践是唯一标准？）", a: "1. 真理本性：主观与客观相符合。\n2. 实践特点：直接现实性（能对照主观与客观）。\n3. 逻辑证明只能起补充作用。\n4. 实践标准具有确定性（唯一性）和不确定性（历史局限性）。" },
+        { q: "必然与自由", a: "1. 自由是认识和利用必然（规律）后的自觉自主状态。\n2. 必然性即规律性。\n3. 关系：自由受必然制约；自由以认识必然为条件（认识条件+实践条件）。\n4. 过程：从必然走向自由是历史性过程。" },
+        
+        // 第三章
+        { q: "社会存在与社会意识的辩证关系", a: "1. 社会存在决定社会意识：社会意识是存在的反映，随存在变化而变化。\n2. 社会意识具有相对独立性：发展不平衡；内部相互影响；对社会存在具有能动的反作用（先进促进，落后阻碍）。" },
+        { q: "社会基本矛盾及其运动规律", a: "1. 生产力与生产关系：生产力决定生产关系（性质、变化）；生产关系反作用于生产力（适合推动，不适合阻碍）。规律：生产关系一定要适合生产力状况。\n2. 经济基础与上层建筑：经济基础决定上层建筑；上层建筑反作用于经济基础（服务于基础）。规律：上层建筑一定要适合经济基础状况。" },
+        { q: "社会形态更替的规律", a: "1. 统一性：五种社会形态依次更替是社会运动一般过程。\n2. 多样性：更替形式、速度、跳跃不同。\n3. 必然性与选择性：规律客观，趋势确定；但主体有能动选择性（受规律和人民意愿约束）。" },
+        { q: "社会发展的根本动力", a: "社会基本矛盾（生产力和生产关系、经济基础和上层建筑）。\n1. 生产力是最终决定力量。\n2. 阶级社会中通过阶级斗争表现（直接动力），革命是最高形式。\n3. 同一社会形态中通过改革解决。" },
+        { q: "唯物史观对人的本质的理解", a: "1. 人是现实的，不是抽象的。\n2. 人的本质是一切社会关系的总和。\n3. 属性：社会属性是本质属性。" },
+        { q: "人民群众是历史的创造者", a: "1. 群众史观 vs 英雄史观。\n2. 决定性作用：社会物质财富创造者；精神财富创造者；社会变革决定力量。\n3. 受历史条件制约。\n4. 党的群众路线：一切为了群众，一切依靠群众，从群众中来，到群众中去。" },
+
+        // 第四章
+        { q: "商品二因素与劳动二重性", a: "1. 商品二因素：使用价值（自然属性）和价值（社会属性）。二者对立统一。\n2. 劳动二重性：具体劳动（创造使用价值）和抽象劳动（形成价值）。\n3. 关系：具体劳动和抽象劳动是同一劳动过程的两个方面。" },
+        { q: "价值量及其决定", a: "1. 由社会必要劳动时间决定。\n2. 与劳动生产率成反比（生产率高，单位商品价值量小）。\n3. 复杂劳动等于多倍简单劳动。" },
+        { q: "价值规律的内容、形式及作用", a: "1. 内容：价值量由社会必要劳动时间决定，等价交换。\n2. 形式：价格围绕价值自发波动。\n3. 作用：积极（调节资源、刺激生产力、调节分配）；消极（资源浪费、阻碍技术扩散、两极分化）。" },
+        { q: "私有制商品经济的基本矛盾", a: "私人劳动和社会劳动的矛盾。\n1. 决定商品经济本质（交换是解决矛盾唯一途径）。\n2. 是其他一切矛盾的基础（决定具体劳动能否转化为抽象劳动）。\n3. 决定商品生产者命运。" },
+        { q: "劳动力成为商品与货币转化为资本", a: "1. 条件：劳动者自由；一无所有。\n2. 劳动力商品特点：价值（维持生存、家属生存、教育费用）；使用价值是价值源泉（能创造剩余价值）。\n3. 货币转化为资本：前提是劳动力成为商品。在生产过程中发生了价值增殖。" },
+        { q: "剩余价值的生产过程与资本本质", a: "1. 资本主义生产过程：劳动过程与价值增殖过程的统一。\n2. 资本本质：能够带来剩余价值的价值，体现剥削关系。\n3. 不变资本(c)与可变资本(v)：v是剩余价值的唯一源泉。" },
+        { q: "绝对剩余价值与相对剩余价值", a: "1. 绝对剩余价值：延长工作日、提高劳动强度。\n2. 相对剩余价值：缩短必要劳动时间，相对延长剩余劳动时间（全社会劳动生产率提高的结果）。\n3. 超额剩余价值：个别企业提高劳动生产率获得的差额。" },
+        { q: "资本积累及其后果", a: "1. 本质：剩余价值资本化。\n2. 源泉：剩余价值。\n3. 后果：扩大再生产；财富两极分化；相对过剩人口（失业，由资本有机构成c:v提高导致）。" },
+        { q: "资本循环与周转", a: "1. 循环三个阶段：购买（货币资本）、生产（生产资本）、售卖（商品资本）。\n2. 条件：空间并存，时间继起。\n3. 周转：周而复始的循环。影响因素：周转时间、固定/流动资本构成。" },
+        { q: "资本主义经济危机", a: "1. 本质：生产相对过剩。\n2. 根本原因：资本主义基本矛盾（生产社会化与生产资料私人占有）。\n3. 周期性：危机、萧条、复苏、高涨。" },
+
+        // 第五章
+        { q: "垄断的形成与垄断组织", a: "1. 规律：自由竞争引起生产集中，集中发展到一定阶段产生垄断。\n2. 原因：获得高额利润；规模巨大限制竞争；联合避免两败俱伤。\n3. 组织：通过联合操纵生产销售，攫取高额垄断利润。" },
+        { q: "垄断条件下的竞争", a: "1. 垄断不能消除竞争（并存）。\n2. 特点：目的（高额垄断利润）；手段（非经济手段，更激烈）；范围（国际）。" },
+        { q: "垄断利润与垄断价格", a: "1. 垄断利润：超过平均利润的高额利润。来源：工人剩余价值、非垄断企业利润、国外掠夺、再分配。\n2. 垄断价格：垄断高价和垄断低价。实质：价值规律作用的具体体现（总量相等）。" },
+        { q: "国家垄断资本主义", a: "1. 本质：国家政权与私人垄断资本融合。\n2. 原因：社会化大生产要求、经济危机、缓和矛盾。\n3. 形式：国企、合营、采购/津贴、宏观调节、微观规制。\n4. 作用：一定程度促进生产力，但未改变资本主义本质。" },
+        { q: "经济全球化", a: "1. 实质：生产力发展和社会化大生产的要求。\n2. 表现：生产、贸易、金融全球化。\n3. 影响：资源配置优化，但也加剧不平衡和风险。" },
+
+    ];
+
+    // 全局状态
+    let questions = [];
+    let currentMode = 'seq';
+    let currentIndex = 0; // 当前指针
+    let errorList = []; 
+    let shuffledIndices = [];
+
+    // 初始化
+    function init() {
+        // 深拷贝并添加原始ID
+        questions = rawData.map((item, index) => ({ id: index, ...item }));
+        // 渲染列表备用
+        renderList();
+        updateUI();
+    }
+
+    // 模式切换
+    function setMode(mode) {
+        const prevMode = currentMode;
+        currentMode = mode;
+        
+        // 样式更新
+        document.querySelectorAll('.mode-group button').forEach(btn => btn.classList.remove('active'));
+        document.getElementById(`mode-${mode}`).classList.add('active');
+
+        const quizArea = document.getElementById('quiz-area');
+        const listArea = document.getElementById('list-view');
+        const navControls = document.getElementById('nav-controls');
+
+        // 视图逻辑
+        if (mode === 'list') {
+            quizArea.style.display = 'none';
+            listArea.style.display = 'block';
+            navControls.style.visibility = 'hidden'; 
+            
+            // 锚点定位：自动滚动到当前题目位置
+            setTimeout(() => {
+                const currentRealIndex = getCurrentIndexValue();
+                const targetId = `list-item-${currentRealIndex}`;
+                const el = document.getElementById(targetId);
+                if (el) {
+                    el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    // 高亮当前项
+                    document.querySelectorAll('.list-item').forEach(i => i.classList.remove('active-item'));
+                    el.classList.add('active-item');
+                }
+            }, 100);
+
+        } else {
+            // 切回答题模式
+            quizArea.style.display = 'flex';
+            listArea.style.display = 'none';
+            navControls.style.visibility = 'visible';
+
+            // 模式初始化逻辑
+            if (mode === 'rand' && prevMode !== 'rand') {
+                shuffledIndices = questions.map(q => q.id).sort(() => Math.random() - 0.5);
+                currentIndex = 0;
+            } else if (mode === 'err') {
+                if (errorList.length === 0) {
+                    alert("错题本为空！请先在其他模式下练习。");
+                    setMode(prevMode); 
+                    return;
+                }
+                currentIndex = 0;
+            } 
+            loadQuestion();
+        }
+    }
+
+    // 获取当前模式下真实的题目ID索引
+    function getCurrentIndexValue() {
+        if (currentMode === 'rand') return shuffledIndices[currentIndex % questions.length];
+        if (currentMode === 'err') return errorList[currentIndex % errorList.length];
+        return currentIndex % questions.length; // seq
+    }
+
+    function getCurrentQuestion() {
+        const idx = getCurrentIndexValue();
+        return questions[idx];
+    }
+
+    // 加载题目
+    function loadQuestion() {
+        resetInputArea();
+        const q = getCurrentQuestion();
+        
+        // 更新显示
+        const displayIndex = (currentMode === 'err') ? (currentIndex % errorList.length + 1) : (currentIndex % questions.length + 1);
+        const total = (currentMode === 'err') ? errorList.length : questions.length;
+        
+        document.getElementById('question-text').innerText = `[${currentMode === 'err' ? '错题' : displayIndex}] ${q.q}`;
+        document.getElementById('jump-index').value = displayIndex; 
+        
+        updateStats(displayIndex, total);
+    }
+
+    // 渲染列表
+    function renderList() {
+        const container = document.getElementById('list-view');
+        let html = '';
+        questions.forEach((item, index) => {
+            html += `
+                <div class="list-item" id="list-item-${index}" onclick="jumpFromList(${index})">
+                    <div class="list-q">${index + 1}. ${item.q}</div>
+                    <div class="list-a">${item.a}</div>
+                </div>
+            `;
+        });
+        container.innerHTML = html;
+    }
+
+    // 从列表跳转
+    function jumpFromList(realIndex) {
+        setMode('seq');
+        currentIndex = realIndex;
+        loadQuestion();
+    }
+
+    function handleJumpEnter(e) {
+        if (e.key === 'Enter') jumpToQuestion();
+    }
+
+    function jumpToQuestion() {
+        const input = document.getElementById('jump-index');
+        let val = parseInt(input.value);
+        let total = currentMode === 'err' ? errorList.length : questions.length;
+
+        if (isNaN(val) || val < 1 || val > total) {
+            alert(`请输入 1 - ${total} 之间的数字`);
+            return;
+        }
+        
+        currentIndex = val - 1; 
+        loadQuestion();
+    }
+
+    function changeQuestion(delta) {
+        let total = currentMode === 'err' ? errorList.length : questions.length;
+        currentIndex += delta;
+        
+        if (currentIndex < 0) currentIndex = total - 1;
+        if (currentIndex >= total) currentIndex = 0;
+        
+        loadQuestion();
+    }
+
+    function resetInputArea() {
+        document.getElementById('result-area').style.display = 'none';
+        document.getElementById('btn-submit').style.display = 'inline-block';
+        document.getElementById('user-input').value = '';
+        document.getElementById('user-input').disabled = false;
+        document.getElementById('btn-submit').innerText = "提交验证";
+        document.getElementById('btn-submit').disabled = false;
+        document.getElementById('btn-submit').style.backgroundColor = 'var(--success-color)';
+    }
+
+    function updateStats(current, total) {
+        document.getElementById('progress-text').innerText = `进度: ${current} / ${total}`;
+        document.getElementById('error-count').innerText = `错题本: ${errorList.length}`;
+    }
+
+    function calculateSimilarity(str1, str2) {
+        const clean1 = str1.replace(/[^\u4e00-\u9fa5a-zA-Z0-9]/g, "");
+        const clean2 = str2.replace(/[^\u4e00-\u9fa5a-zA-Z0-9]/g, "");
+        if (clean2.length === 0) return 0;
+        
+        let matchCount = 0;
+        let tempStr1 = clean1;
+        for (let char of clean2) {
+            if (tempStr1.includes(char)) {
+                matchCount++;
+                tempStr1 = tempStr1.replace(char, ''); 
+            }
+        }
+        const maxLength = Math.max(clean1.length, clean2.length);
+        if (maxLength === 0) return 0;
+        return Math.floor((matchCount / maxLength) * 100);
+    }
+
+    function checkAnswer() {
+        const userVal = document.getElementById('user-input').value;
+        const currentQ = getCurrentQuestion();
+        
+        if (!userVal.trim()) {
+            alert("请先输入答案");
+            return;
+        }
+
+        const score = calculateSimilarity(userVal, currentQ.a);
+        const passed = score >= 70;
+
+        if (!passed) {
+            if (!errorList.includes(currentQ.id)) errorList.push(currentQ.id);
+        }
+
+        const resultHeader = document.getElementById('result-header');
+        const badgeClass = passed ? 'badge-pass' : 'badge-fail';
+        const badgeText = passed ? '通过' : '未通过';
+        
+        resultHeader.innerHTML = `
+            <span class="score-badge ${badgeClass}">${badgeText}</span>
+            <span>得分: ${score}</span>
+        `;
+        
+        document.getElementById('score-text').innerText = `准确率: ${score}%`;
+        document.getElementById('standard-answer').innerHTML = currentQ.a.replace(/\n/g, '<br>');
+        document.getElementById('result-area').style.display = 'block';
+
+        const submitBtn = document.getElementById('btn-submit');
+        submitBtn.innerText = passed ? "回答正确" : "回答错误";
+        submitBtn.disabled = true;
+        submitBtn.style.backgroundColor = passed ? '#95a5a6' : '#95a5a6';
+        
+        updateStats((currentMode === 'err' ? currentIndex % errorList.length + 1 : currentIndex % questions.length + 1), 
+                    (currentMode === 'err' ? errorList.length : questions.length));
+    }
+
+    function updateUI() {
+        setMode('seq');
+    }
+
+    init();
+
+</script>
+
+</body>
+</html>
