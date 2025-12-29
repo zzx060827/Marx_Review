@@ -647,7 +647,7 @@
         }
 
         const score = calculateSimilarity(userVal, currentQ.a);
-        const passed = score >= 70;
+        const passed = score >= 60;
 
         if (!passed) {
             if (!errorList.includes(currentQ.id)) errorList.push(currentQ.id);
